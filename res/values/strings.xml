@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">SibiJ.YuC.Act01</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_contacts">ContactsActivity</string>
+    <string name="no_contacts">No Contacts Found</string>
+    <string name="contacts_activity">Contacts</string>
+
+</resources>
