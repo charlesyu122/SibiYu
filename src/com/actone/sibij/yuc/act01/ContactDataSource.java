@@ -49,6 +49,7 @@ public class ContactDataSource {
 		cursor.moveToFirst();
 		while(!cursor.isAfterLast()){
 			Contact contact = cursorToContact(cursor);
+			Log.d("RETRIEVEDID", ""+contact.id);
 			contacts.add(contact);
 			cursor.moveToNext();
 		}
@@ -60,6 +61,14 @@ public class ContactDataSource {
 	public void deleteContact(Contact contact){
 		long id = contact.id;
 		database.delete(MySQLiteHelper.TABLE_CONTACTS, MySQLiteHelper.COLUMN_ID + " = " + id, null);
+	}
+	
+	public void editContact(long id, String name, String number){
+		// Edit contact
+		ContentValues values = new ContentValues();
+		values.put(MySQLiteHelper.COLUMN_NAME, name);
+		values.put(MySQLiteHelper.COLUMN_NUMBER, number);
+		database.update(MySQLiteHelper.TABLE_CONTACTS, values, MySQLiteHelper.COLUMN_ID+"="+id , null);
 	}
 	
 	private Contact cursorToContact(Cursor cursor){

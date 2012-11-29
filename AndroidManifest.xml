@@ -6,7 +6,8 @@
     <uses-sdk
         android:minSdkVersion="15"
         android:targetSdkVersion="15" />
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -14,12 +15,22 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".ContactsActivity"
-            android:theme="@android:style/Theme.Light.NoTitleBar"
-            android:label="@string/title_activity_contacts" >
+            android:label="@string/title_activity_contacts"
+            android:theme="@android:style/Theme.Light.NoTitleBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".EditContact"
+            android:label="@string/title_activity_contacts"
+            android:theme="@android:style/Theme.Light.NoTitleBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
     </application>

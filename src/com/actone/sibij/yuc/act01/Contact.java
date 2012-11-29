@@ -1,6 +1,9 @@
 package com.actone.sibij.yuc.act01;
 
-public class Contact {
+import java.io.Serializable;
+
+@SuppressWarnings("serial")
+public class Contact implements Serializable {
 	
 	long id;
 	String appContactsId;

@@ -15,12 +15,15 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 import android.app.ListActivity;
+import android.content.Intent;
 import android.database.Cursor;
 
 public class ContactsActivity extends ListActivity {
 
 	private ContactDataSource datasource;
 	Contact selectedContact;
+	List<Contact> contactsToDisplay;
+	TextView tvTitle, tvNoContact;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,15 +34,16 @@ public class ContactsActivity extends ListActivity {
 		datasource = new ContactDataSource(this);
 		datasource.open();
 		selectedContact = new Contact();
+		contactsToDisplay = new ArrayList<Contact>();
 		
         setup();
     }
     
     private void setup(){
     	// Setup views
-    	TextView tvTitle = (TextView)findViewById(R.id.tvListHeaderTitle);
+    	tvTitle = (TextView)findViewById(R.id.tvListHeaderTitle);
+    	tvNoContact = (TextView)findViewById(R.id.tvNoContacts);
     	tvTitle.setText("Contacts");
-    	final TextView tvNoContact = (TextView)findViewById(R.id.tvNoContacts);
     	
     	// Retrieve contents from Contact Application
     	Cursor cursor = getContacts();
@@ -53,13 +57,7 @@ public class ContactsActivity extends ListActivity {
         }
         
         // Retrieve contacts from sqlite
-        final List<Contact> contactsToDisplay = datasource.getAllContacts();
-  
-    	if(contactsToDisplay.size() > 0){
-    		tvNoContact.setVisibility(View.GONE);
-	    	// Setup list
-	    	getListView().setAdapter(new ContactAdapter(ContactsActivity.this, (ArrayList<Contact>)contactsToDisplay,'n'));
-    	}
+        displayContactsFromSQLite();
     	
     	// Set up Quick Action
     	ActionItem editAction = new ActionItem();
@@ -91,7 +89,12 @@ public class ContactsActivity extends ListActivity {
 				// TODO Auto-generated method stub
 				if(pos == 0){
 					// Edit contact
-					
+					Intent i = new Intent();
+					Bundle b = new Bundle();
+					b.putSerializable("contactToEdit", selectedContact);
+					i.putExtras(b);
+					i.setClass(ContactsActivity.this, EditContact.class);
+					startActivityForResult(i, 1);
 				}else if(pos == 1){
 					// Delete contact
 					datasource.deleteContact(selectedContact);
@@ -105,25 +108,32 @@ public class ContactsActivity extends ListActivity {
 		});
     }
 
-	@SuppressWarnings("deprecation")
 	private Cursor getContacts() {
 		// TODO Auto-generated method stub
 		// Run query
 	    Uri uri = ContactsContract.Contacts.CONTENT_URI;
 	    String[] projection = new String[] {ContactsContract.Contacts._ID, 
-	    									ContactsContract.Contacts.DISPLAY_NAME, 
-	    };
-	    return managedQuery(uri, projection, null, null, null);
+	    									ContactsContract.Contacts.DISPLAY_NAME, };
+	    return getContentResolver().query(uri, projection, null, null, null);
 	}
 	
-	@SuppressWarnings("deprecation")
+	private void displayContactsFromSQLite(){
+        contactsToDisplay = datasource.getAllContacts();
+        
+    	if(contactsToDisplay.size() > 0){
+    		tvNoContact.setVisibility(View.GONE);
+	    	// Setup list
+	    	getListView().setAdapter(new ContactAdapter(ContactsActivity.this, (ArrayList<Contact>)contactsToDisplay,'n'));
+    	}
+	}
+	
 	private String getContactPhone(String contactID) {
 	    Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
 	    String[] projection = null;
 	    String where = ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = ?";
 	    String[] selectionArgs = new String[] { contactID };
 	    String sortOrder = null;
-	    Cursor result = managedQuery(uri, projection, where, selectionArgs, sortOrder);
+	    Cursor result = getContentResolver().query(uri, projection, where, selectionArgs, sortOrder);
 	    if (result.moveToFirst()) {
 	        String phone = result.getString(result.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 	        if (phone != null) {
@@ -133,5 +143,14 @@ public class ContactsActivity extends ListActivity {
 	    }
 	    result.close();
 	    return null;
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == 1 && resultCode == RESULT_OK){
+			displayContactsFromSQLite();
+		}
 	}
 }
