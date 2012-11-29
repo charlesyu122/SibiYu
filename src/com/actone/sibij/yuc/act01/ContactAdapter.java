@@ -13,19 +13,21 @@ public class ContactAdapter extends ArrayAdapter<Contact>{
 	
 	private Context context;
 	Contact[] values = null;
+	private char type; // n for normal d for delete
 	
-	public ContactAdapter(Context context, ArrayList<Contact> contactList) {
+	public ContactAdapter(Context context, ArrayList<Contact> contactList, char type) {
 		super(context, R.layout.list_item, contactList);
 		// TODO Auto-generated constructor stub
 		this.context = context;
 		this.values = contactList.toArray(new Contact[contactList.size()]);
+		this.type = type;
 	}
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		// TODO Auto-generated method stub
 		View rowView = convertView;
-		if(rowView == null){
+		if(rowView == null || type == 'd'){
 			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			rowView = inflater.inflate(R.layout.list_item, parent, false);
 		}

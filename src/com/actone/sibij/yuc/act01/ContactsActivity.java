@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 import android.app.ListActivity;
@@ -38,7 +39,7 @@ public class ContactsActivity extends ListActivity {
     	// Setup views
     	TextView tvTitle = (TextView)findViewById(R.id.tvListHeaderTitle);
     	tvTitle.setText("Contacts");
-    	TextView tvNoContact = (TextView)findViewById(R.id.tvNoContacts);
+    	final TextView tvNoContact = (TextView)findViewById(R.id.tvNoContacts);
     	
     	// Retrieve contents from Contact Application
     	Cursor cursor = getContacts();
@@ -52,12 +53,12 @@ public class ContactsActivity extends ListActivity {
         }
         
         // Retrieve contacts from sqlite
-        List<Contact> contactsToDisplay = datasource.getAllContacts();
+        final List<Contact> contactsToDisplay = datasource.getAllContacts();
   
     	if(contactsToDisplay.size() > 0){
     		tvNoContact.setVisibility(View.GONE);
 	    	// Setup list
-	    	getListView().setAdapter(new ContactAdapter(ContactsActivity.this, (ArrayList<Contact>)contactsToDisplay));
+	    	getListView().setAdapter(new ContactAdapter(ContactsActivity.this, (ArrayList<Contact>)contactsToDisplay,'n'));
     	}
     	
     	// Set up Quick Action
@@ -65,7 +66,7 @@ public class ContactsActivity extends ListActivity {
     	editAction.setIcon(getResources().getDrawable(R.drawable.ic_add));
     	editAction.setTitle("Edit");
     	ActionItem deleteAction = new ActionItem();
-    	deleteAction.setIcon(getResources().getDrawable(R.drawable.ic_accept));
+    	deleteAction.setIcon(getResources().getDrawable(R.drawable.ic_delete));
     	deleteAction.setTitle("Delete");
     	
     	final QuickAction myQA = new QuickAction(this);
@@ -93,7 +94,12 @@ public class ContactsActivity extends ListActivity {
 					
 				}else if(pos == 1){
 					// Delete contact
-					
+					datasource.deleteContact(selectedContact);
+					contactsToDisplay.remove(selectedContact);
+					if(contactsToDisplay.size() == 0)
+						tvNoContact.setVisibility(View.VISIBLE);
+					getListView().setAdapter(new ContactAdapter(ContactsActivity.this, (ArrayList<Contact>)contactsToDisplay,'d'));
+					Toast.makeText(ContactsActivity.this, "Contact Successfully Deleted!", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
